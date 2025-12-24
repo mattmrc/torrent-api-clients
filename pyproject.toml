@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "torrent-api-clients"
+version = "0.1.0"
+description = "CLI tools to query torrent metadata APIs and export CSVs."
+readme = "readme.md"
+requires-python = ">=3.11"
+license = {file = "LICENSE"}
+authors = [{name = "Matheus Cabral"}]
+dependencies = ["requests>=2.31"]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.4",
+  "ruff>=0.6",
+  "mypy>=1.8",
+  "types-requests>=2.31",
+]
+
+[project.scripts]
+torrent-api-clients = "torrent_api_clients.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["torrent_api_clients*"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.11"
+warn_unused_ignores = true
+warn_redundant_casts = true
+strict_optional = true
+
+[tool.pytest.ini_options]
+addopts = "-q"
