@@ -1,17 +1,17 @@
 from __future__ import annotations
 
-import os
 from dataclasses import dataclass
 from pathlib import Path
+from types import ModuleType
 from typing import Any
 
 try:
-    import tomllib
+    import tomllib as _tomllib
+    tomllib: ModuleType | None = _tomllib
 except ModuleNotFoundError:  # pragma: no cover
     tomllib = None
 
 from .utils import apply_env_override
-
 
 DEFAULT_USER_AGENT = "torrent-api-clients/0.1 (+https://example.invalid)"
 

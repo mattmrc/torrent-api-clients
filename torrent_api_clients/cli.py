@@ -3,9 +3,9 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from .config import AppConfig
 from .clients.eztv import EZTVClient
 from .clients.tpb import TPBClient
+from .config import AppConfig
 from .utils import resolve_output_path, safe_filename, write_csv
 
 
@@ -16,8 +16,16 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--config", type=Path, help="Path to a config TOML file")
     parser.add_argument("--output", type=Path, help="Override output directory")
-    parser.add_argument("--append", action="store_true", help="Append rows to an existing CSV")
-    parser.add_argument("--no-timestamp", action="store_true", help="Do not add timestamp to filenames")
+    parser.add_argument(
+        "--append",
+        action="store_true",
+        help="Append rows to an existing CSV",
+    )
+    parser.add_argument(
+        "--no-timestamp",
+        action="store_true",
+        help="Do not add timestamp to filenames",
+    )
 
     subparsers = parser.add_subparsers(dest="provider", required=True)
 
@@ -65,7 +73,7 @@ def main(argv: list[str] | None = None) -> int:
     timestamp = not args.no_timestamp
 
     if args.provider == "tpb":
-        client = TPBClient(
+        tpb_client = TPBClient(
             base_url=config.tpb_base_url,
             timeout=config.timeout,
             user_agent=config.user_agent,
@@ -76,9 +84,9 @@ def main(argv: list[str] | None = None) -> int:
         prefix = f"tpb_{category_label}_{safe_query}"
 
         if args.category == "movies":
-            records = client.search_hd_movies(query=query, limit=args.limit)
+            records = tpb_client.search_hd_movies(query=query, limit=args.limit)
         else:
-            records = client.search_hd_tv(query=query, limit=args.limit)
+            records = tpb_client.search_hd_tv(query=query, limit=args.limit)
 
         records = TPBClient.sort_by_seeders(records)
         output_path = resolve_output_path(output_dir, prefix, args.append, timestamp)
@@ -87,14 +95,14 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.provider == "eztv":
-        client = EZTVClient(
+        eztv_client = EZTVClient(
             base_url=config.eztv_base_url,
             timeout=config.timeout,
             user_agent=config.user_agent,
         )
 
         if args.command == "latest":
-            records = client.get_latest(
+            records = eztv_client.get_latest(
                 limit=args.limit,
                 page=args.page,
                 min_1080p=args.min_1080p or config.min_1080p,
@@ -106,7 +114,7 @@ def main(argv: list[str] | None = None) -> int:
             return 0
 
         if args.command == "show":
-            records = client.get_show_by_imdb(
+            records = eztv_client.get_show_by_imdb(
                 imdb_id=args.imdb_id,
                 season=args.season,
                 min_1080p=args.min_1080p or config.min_1080p,
@@ -121,7 +129,7 @@ def main(argv: list[str] | None = None) -> int:
             return 0
 
         if args.command == "top":
-            records = client.get_top_seeded(
+            records = eztv_client.get_top_seeded(
                 limit_fetch=args.limit_fetch,
                 top_n=args.top_n,
                 min_1080p=args.min_1080p or config.min_1080p,

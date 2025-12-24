@@ -35,7 +35,12 @@ class EZTVClient:
 
         return torrents
 
-    def get_latest(self, limit: int = 50, page: int = 1, min_1080p: bool = False) -> list[TorrentRecord]:
+    def get_latest(
+        self,
+        limit: int = 50,
+        page: int = 1,
+        min_1080p: bool = False,
+    ) -> list[TorrentRecord]:
         params = {"limit": limit, "page": page}
         results = self._fetch(params)
         if min_1080p:
