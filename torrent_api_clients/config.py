@@ -7,6 +7,7 @@ from typing import Any
 
 try:
     import tomllib as _tomllib
+
     tomllib: ModuleType | None = _tomllib
 except ModuleNotFoundError:  # pragma: no cover
     tomllib = None
